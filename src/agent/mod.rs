@@ -1,3 +1,4 @@
+pub mod custom_agents;
 pub mod errors;
 pub mod settings;
 pub mod spo_agents;
@@ -19,9 +20,10 @@ use crate::{
     context::{integrations::core::BufferDisplay, Context},
     language_models::openai::{functions::CustomFunction, gpt::Gpt},
 };
+use serde::Deserialize;
 use serde_json::Value;
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize)]
 pub struct Agent {
     pub context: Context,
     gpt: Gpt,
