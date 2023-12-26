@@ -57,7 +57,12 @@ impl GptConfig {
             .global_settings()
             .expect("Failed to get model settings")
             .language_model;
-        let api_key = settings.api_key;
+        let api_key = settings.api_key.unwrap_or_else(|| {
+            tracing::warn!(
+                "GptConfig initialized without an API Key, completions will be unavailable"
+            );
+            String::new()
+        });
         let model = GptModel::default();
         let client = Client::new();
         let url = "https://api.openai.com/v1/chat/completions".to_string();

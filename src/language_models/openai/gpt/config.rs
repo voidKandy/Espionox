@@ -51,12 +51,17 @@ pub struct Gpt {
     pub model_override: Option<GptModel>,
 }
 
-/// More variations of these models should be added
+/// OpenAi's Gpt
+/// Supports:
+/// * Gpt3 (gpt-3.5-turbo-1106)
+/// * Gpt4 (gpt-4)
+/// * Custom for other variations of GPT4 or even fine tuned models
 #[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq, Eq)]
 pub enum GptModel {
     #[default]
     Gpt3,
     Gpt4,
+    Custom(String),
 }
 
 impl TryFrom<String> for GptModel {
@@ -65,10 +70,7 @@ impl TryFrom<String> for GptModel {
         match value.as_str() {
             "gpt-3.5-turbo-1106" => Ok(Self::Gpt3),
             "gpt-4" => Ok(Self::Gpt4),
-            _ => Err(GptError::Undefined(anyhow!(
-                "{} does not have a corresponding GPT variant",
-                value
-            ))),
+            custom => Ok(Self::Custom(custom.to_string())),
         }
     }
 }
@@ -78,6 +80,7 @@ impl ToString for GptModel {
         String::from(match self {
             Self::Gpt3 => "gpt-3.5-turbo-1106",
             Self::Gpt4 => "gpt-4",
+            Self::Custom(c) => c,
         })
     }
 }

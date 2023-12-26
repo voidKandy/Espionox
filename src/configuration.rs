@@ -31,7 +31,7 @@ struct GlobalSettingsBuilder {
 #[derive(Clone, Debug)]
 pub struct LanguageModelSettings {
     pub default_model: GptModel,
-    pub api_key: String,
+    pub api_key: Option<String>,
 }
 
 #[derive(Clone, Debug)]
@@ -68,7 +68,7 @@ impl OverwriteWith<SettingsYamlMap> for LanguageModelSettings {
                     self.default_model = val.try_into().unwrap();
                 }
                 "api_key" => {
-                    self.api_key = val;
+                    self.api_key = Some(val);
                 }
                 _ => {}
             }
@@ -147,7 +147,7 @@ impl TryFrom<&SettingsYamlMap> for LanguageModelSettings {
         };
         Ok(LanguageModelSettings {
             default_model,
-            api_key: api_key.ok_or_else(|| anyhow::anyhow!("Missing api key"))?,
+            api_key,
         })
     }
 }
@@ -276,6 +276,7 @@ impl ConfigEnv {
             .try_into()
             .unwrap();
         if let Some(path) = default_config_override {
+            tracing::info!("Overriding defaults from: {:?}", path);
             let override_map = global_yaml_map_from_path(path);
             df_settings.overwrite_with(override_map);
         }

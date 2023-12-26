@@ -24,6 +24,22 @@ pub enum ObservationStep {
     BeforeAndAfterPrompt,
 }
 
+/// Sensible defaults:
+/// * Default observer agent
+/// * Mutate input step: BeforePrompt
+/// * Mutate agent step: None
+impl Default for AgentObserver {
+    fn default() -> Self {
+        let agent = Self::default_agent();
+        let protocol = ObservationProtocol {
+            mutate_agent: None,
+            mutate_input: Some(ObservationStep::BeforePrompt),
+        };
+        AgentObserver { agent: Box::new(agent), protocol }
+
+    }
+}
+
 impl ObservationProtocol {
     pub fn agent_mutator(&mut self, step: ObservationStep) {
         self.mutate_agent = Some(step);
